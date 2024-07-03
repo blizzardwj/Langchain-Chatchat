@@ -104,7 +104,7 @@ class ConfigWorkSpace(Generic[CF, F], ABC):
         for cfg in store_cfg:
             if cfg.get("type") == store_cfg_type:
                 return store_cfg.index(cfg)
-
+        # if not found return the last one ???
         return -1
 
     def get_config_by_type(self, cfg_type) -> Dict[str, Any]:

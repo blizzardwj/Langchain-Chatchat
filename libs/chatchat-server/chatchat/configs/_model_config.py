@@ -47,7 +47,8 @@ class ConfigModelFactory(core_config.ConfigFactory[ConfigModel]):
 
     def __init__(self):
         # 默认选用的 LLM 名称
-        self.DEFAULT_LLM_MODEL = "glm4-chat"
+        # self.DEFAULT_LLM_MODEL = "glm4-chat"
+        self.DEFAULT_LLM_MODEL = "glm-4-9b-chat"
 
         # 默认选用的 Embedding 名称
         self.DEFAULT_EMBEDDING_MODEL = "bge-large-zh-v1.5"
@@ -123,7 +124,8 @@ class ConfigModelFactory(core_config.ConfigFactory[ConfigModel]):
                 "api_concurrencies": 5,
                 "llm_models": [
                     "chatglm3",
-                    "glm4-chat",
+                    # "glm4-chat",
+                    "glm-4-9b-chat",
                     "qwen1.5-chat",
                     "qwen2-instruct",
                 ],
@@ -135,6 +137,14 @@ class ConfigModelFactory(core_config.ConfigFactory[ConfigModel]):
                 "speech2text_models": [],
                 "tts_models": [],
             },
+            {
+                "platform_name": "ollama",
+                "platform_type": "ollama",
+                "api_base_url": "http://127.0.0.1:11434",
+                "api_key":"EMPT",
+                "api_concurrencies": 5,
+                "llm_models": [],
+            }
         ]
         # 工具配置项
         self.TOOL_CONFIG = {
