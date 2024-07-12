@@ -88,10 +88,14 @@ class ConfigKbFactory(core_config.ConfigFactory[ConfigKb]):
         self.OVERLAP_SIZE = 50
 
         # 知识库匹配向量数量
-        self.VECTOR_SEARCH_TOP_K = 3
+        self.VECTOR_SEARCH_TOP_K = 5
 
         # 知识库匹配相关度阈值，取值范围在0-1之间，SCORE越小，相关度越高，取到1相当于不筛选，建议设置在0.5左右
-        self.SCORE_THRESHOLD = 1
+        # fix: if convert a vectorstore to a retriever class, this class will use `invoke`, get_relevant_documents,
+        # or _get_relevant_documents methods which will eventually call `similarity_search_with_relevance_scores`.
+        # This method says that "0 is dissimilar, 1 is most similar" so the threshold must be under 1.
+        # Also need to mod the cooresponding value in _model_config.py
+        self.SCORE_THRESHOLD = 0.5
 
         # 默认搜索引擎。可选：bing, duckduckgo, metaphor
         self.DEFAULT_SEARCH_ENGINE = "duckduckgo"
