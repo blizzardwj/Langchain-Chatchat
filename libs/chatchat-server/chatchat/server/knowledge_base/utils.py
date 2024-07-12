@@ -4,13 +4,15 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Generator, List, Tuple, Union
+from typing import Dict, Generator, List, Tuple, Union, Type
 
 import chardet
 import langchain_community.document_loaders
 from langchain.docstore.document import Document
 from langchain.text_splitter import MarkdownHeaderTextSplitter, TextSplitter
 from langchain_community.document_loaders import JSONLoader, TextLoader
+from chatchat.server.knowledge_base.kb_metadatas import BaseMetadata
+from chatchat.server.knowledge_base.model.my_metadatas import KB_NEED_METADATA
 
 from chatchat.configs import (
     CHUNK_SIZE,
@@ -387,6 +389,35 @@ class KnowledgeFile:
         self.splited_docs = docs
         return self.splited_docs
 
+    def probe_file_metadata(
+            self,
+            probe_class: Type[BaseMetadata],
+            docs: List[Document] = None,
+    ) -> Dict:
+        '''
+        探测文件的元数据，返回文件的元数据
+        '''
+
+        if docs is None:
+            docs = self.docs
+
+        if not bool(docs[0].page_content):
+            return {}
+
+        file_info = {
+            "doc_name": self.filename,
+            "file_path": self.filepath,
+        }
+
+        try:
+            document_metadata = probe_class()
+            document_metadata.acquire_metadata(**file_info)
+            return document_metadata.dict()
+        except Exception as e:
+            msg = f"probe metadata for file {self.filepath} error: {e}"
+            logger.error(f'{e.__class__.__name__}: {msg}')
+            return {}
+
     def file2text(
         self,
         zh_title_enhance: bool = ZH_TITLE_ENHANCE,
@@ -397,6 +428,23 @@ class KnowledgeFile:
     ):
         if self.splited_docs is None or refresh:
             docs = self.file2docs()
+
+            # todo add customized metadatas
+            if self.kb_name in KB_NEED_METADATA.keys():
+                '''
+                add probe_class name as metadata key and metadata_dict as value
+                to a new metadata content
+                '''
+                probe_class = KB_NEED_METADATA[self.kb_name]
+                metadata_dict = self.probe_file_metadata(probe_class=probe_class,
+                                                         docs=docs)
+                if not bool(metadata_dict):
+                    logger.warning(f"未能获取文件{self.filepath}的元数据")
+                else:
+                    # docs[0].metadata.update(metadata_dict)
+                    # docs[0].metadata |= metadata_dict
+                    docs[0].metadata[probe_class.__name__] = metadata_dict
+
             self.splited_docs = self.docs2texts(
                 docs=docs,
                 zh_title_enhance=zh_title_enhance,
