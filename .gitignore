@@ -9,6 +9,10 @@
 !/libs/chatchat-server/chatchat/data/nltk_data
 config/
 .vscode/
+# UI
+/libs/chatchat-server/chatchat/img/*
+/libs/chatchat-server/chatchat/webui.py
+/libs/chatchat-server/chatchat/webui_pages/*
 
 # below are standard python ignore files
 # Byte-compiled / optimized / DLL files
