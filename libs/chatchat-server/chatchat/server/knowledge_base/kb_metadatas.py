@@ -12,7 +12,8 @@ from datetime import datetime
 import pydantic
 from pydantic import BaseModel, Field
 from packaging import version
-from typing import Dict, ClassVar, Any, Optional
+from typing import List, Dict, ClassVar, Any, Optional
+from chatchat.server.knowledge_base.model.kb_document_model import DocumentWithVSId
 
 pydantic_v = version.parse(pydantic.__version__)
 
@@ -143,6 +144,65 @@ KB_NEED_METADATA = {
     "Type1_kb": Type1Metadata,
     "Type2_kb": Type2Metadata,
 }
+
+
+class SampleContextProcessor:
+    """
+    Get context for analysis from sample metadata
+    """
+
+    def __init__(self, metadata_keys: List[str]):
+        self.selected_items = metadata_keys
+
+    def set_sample_source(self, kb_name: str, docs: List[DocumentWithVSId]):
+        self.kb_name = kb_name
+        self.docs = docs
+        self.expander_context = []
+
+    @staticmethod
+    def format_dict_to_string(data_dict: Dict, keys: List[str]):
+        """
+        Formats selected keys from a dictionary into a specific string format.
+        Note: just one piece of information in one paragraph
+
+        Args:
+        data (dict): The dictionary from which to extract the data.
+        keys (list): A list of keys which are to be included in the output string.
+
+        Returns:
+        str: A formatted string containing selected key-value pairs.
+        """
+        lines = []
+        for _, key in enumerate(keys):
+            if key in data_dict:
+                lines.append(f"- {key}: {data_dict[key]}")
+        return "\n".join(lines) + "\n\n"
+
+    def _get_metadata_dict_from_VSdoc(self, kb_name: str, doc: DocumentWithVSId):
+        # get metadata from a document in vector store
+        metadata_dict = doc.metadata.get(KB_NEED_METADATA[kb_name].__name__, "")
+        return metadata_dict
+
+    def get_sample_context(self, info_keys: List[str] = []) -> str:
+        # get multiple pieces of information to construct for RAG (return value) and expander (in UI)
+        if not info_keys:
+            self.selected_items = info_keys
+        # else use selected items in init
+        sample_context = []
+        for idx, doc in enumerate(self.docs):
+            metadata_dict = self.get_metadata_dict_from_VSdoc(self.kb_name, doc)
+            one_piece = self.format_dict_to_string(metadata_dict, info_keys)
+            sample_context.append(f"Metadata {idx + 1}:\n\n{one_piece}")
+        self.expander_context = sample_context
+        return "".join(sample_context)
+
+
+SELECTED_METADATA_KEYS = ["level", "category"]
+context_processor = SampleContextProcessor(metadata_keys=SELECTED_METADATA_KEYS)
+# context_processor.set_sample_source("kb_name", docs)
+# context_for_llm = context_processor.get_sample_context()
+# expander_context = context_processor.expander_context
+
 
 # test code
 if __name__ == "__main__":
