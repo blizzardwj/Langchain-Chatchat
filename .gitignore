@@ -12,7 +12,6 @@ config/
 # UI
 /libs/chatchat-server/chatchat/img/chat_icon_129360.png
 /libs/chatchat-server/chatchat/img/zf_info_logo.png
-/libs/chatchat-server/chatchat/webui.py
 # metadata
 /libs/chatchat-server/chatchat/server/knowledge_base/model/my_metadatas.py
 # knowledge sample tool
