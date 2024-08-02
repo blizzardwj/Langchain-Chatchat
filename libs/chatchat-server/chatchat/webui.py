@@ -16,13 +16,16 @@ if __name__ == "__main__":
     is_lite = "lite" in sys.argv  # TODO: remove lite mode
 
     st.set_page_config(
-        "Langchain-Chatchat WebUI",
-        get_img_base64("chatchat_icon_blue_square_v2.png"),
+        # "Langchain-Chatchat WebUI",
+        # get_img_base64("chatchat_icon_blue_square_v2.png"),
+        "Content Analysis WebUI",
+        get_img_base64("chat_icon_129360.png"),
         initial_sidebar_state="expanded",
         menu_items={
             "Get Help": "https://github.com/chatchat-space/Langchain-Chatchat",
             "Report a bug": "https://github.com/chatchat-space/Langchain-Chatchat/issues",
-            "About": f"""欢迎使用 Langchain-Chatchat WebUI {__version__}！""",
+            # "About": f"""欢迎使用 Langchain-Chatchat WebUI {__version__}！""",
+            "About": f"""Welcome to Content Analysis WebUI {__version__}！""",
         },
         layout="centered",
     )
@@ -46,7 +49,8 @@ if __name__ == "__main__":
 
     with st.sidebar:
         st.image(
-            get_img_base64("logo-long-chatchat-trans-v2.png"), use_column_width=True
+            # get_img_base64("logo-long-chatchat-trans-v2.png"), use_column_width=True
+            get_img_base64("zf_info_logo.png"), use_column_width = True
         )
         st.caption(
             f"""<p align="right">当前版本：{__version__}</p>""",

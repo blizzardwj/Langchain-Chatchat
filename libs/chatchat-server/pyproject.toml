@@ -67,7 +67,7 @@ streamlit-paste-button = "0.1.2"
 python-docx = "1.1.2"
 
 [tool.poetry.extras]
-xinference = ["xinference_client"]
+xinference = ["xinference-client"]
 zhipuai = ["zhipuai"]
 ollama = ["ollama"]
 

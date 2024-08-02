@@ -71,8 +71,13 @@ def search_docs(
     if kb is not None:
         if query:
             docs = kb.search_docs(query, top_k, score_threshold)
-            # data = [DocumentWithVSId(**x[0].dict(), score=x[1], id=x[0].metadata.get("id")) for x in docs]
-            data = [DocumentWithVSId(**{"id": x.metadata.get("id"), **x.dict()}) for x in docs]
+            if not docs:
+                data = [DocumentWithVSId(**x.dict(), id=x.metadata.get("id")) for x in docs]
+            elif all(isinstance(item, tuple) for item in docs):
+                # if use customized retriever which will return tuple of (doc, score)
+                data = [DocumentWithVSId(**x[0].dict(), score=x[1], id=x[0].metadata.get("id")) for x in docs]
+            else:
+                data = [DocumentWithVSId(**x.dict(), id=x.metadata.get("id")) for x in docs]
         elif file_name or metadata:
             data = kb.list_docs(file_name=file_name, metadata=metadata)
             for d in data:

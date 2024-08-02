@@ -22,6 +22,7 @@ from chatchat.server.utils import (wrap_done, get_ChatOpenAI, get_default_llm,
                                    BaseResponse, get_prompt_template, build_logger,
                                    check_embed_model, api_address
                                 )
+from chatchat.server.knowledge_base.model.my_metadatas import KB_NEED_METADATA
 
 
 logger = build_logger()
@@ -83,7 +84,7 @@ async def kb_chat(query: str = Body(..., description="用户输入", examples=["
                                                 score_threshold=score_threshold,
                                                 file_name="",
                                                 metadata={})
-                source_documents = format_reference(kb_name, docs, api_address(is_public=True))
+                source_documents, _ = format_reference(kb_name, docs, api_address(is_public=True))
             elif mode == "temp_kb":
                 ok, msg = check_embed_model()
                 if not ok:
@@ -93,7 +94,7 @@ async def kb_chat(query: str = Body(..., description="用户输入", examples=["
                                                 query=query,
                                                 top_k=top_k,
                                                 score_threshold=score_threshold)
-                source_documents = format_reference(kb_name, docs, api_address(is_public=True))
+                source_documents, _ = format_reference(kb_name, docs, api_address(is_public=True))
             elif mode == "search_engine":
                 result = await run_in_threadpool(search_engine, query, top_k, kb_name)
                 docs = [x.dict() for x in result.get("docs", [])]
@@ -162,9 +163,20 @@ async def kb_chat(query: str = Body(..., description="用户输入", examples=["
             #     print(docs)
             context = "\n\n".join([doc["page_content"] for doc in docs])
 
+            # tofix: 通常在rerank之后再利用docs生成reference和context
+            if mode in ["local_kb", "temp_kb"]:
+                source_documents, context = format_reference(kb_name, docs, api_address(is_public=True))
+            else:
+                context = "\n\n".join([doc["page_content"] for doc in docs])
+
             if len(docs) == 0:  # 如果没有找到相关文档，使用empty模板
                 prompt_name = "empty"
-            prompt_template = get_prompt_template("rag", prompt_name)
+            if kb_name in KB_NEED_METADATA.keys():
+                template_name = "rag_metadata"
+            else:
+                template_name = "rag"
+            # prompt_template = get_prompt_template("rag", prompt_name)
+            prompt_template = get_prompt_template(template_name, prompt_name)
             input_msg = History(role="user", content=prompt_template).to_msg_template(False)
             chat_prompt = ChatPromptTemplate.from_messages(
                 [i.to_msg_template() for i in history] + [input_msg])

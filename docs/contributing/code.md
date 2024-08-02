@@ -12,16 +12,16 @@
 ## 依赖管理：Poetry 与 env/dependency 管理方法
 这个项目使用 Poetry 来管理依赖。
 > [!Note]
-> 在安装 Poetry 之前，如果您使用 Conda，请创建并激活一个新的 Conda 环境，例如使用 `conda create -n chatchat python=3.9` 创建一个新的 Conda 环境。
+> 在安装 Poetry 之前，如果您使用 Conda，请创建并激活一个新的 Conda 环境，例如使用 `conda create -n chatchat python=3.9` 创建一个新的 Conda 环境。Poetry**必须**安装在虚拟环境中，否则其依赖存在被误删的风险。
 
 安装 Poetry: [Poetry 安装文档](https://python-poetry.org/docs/#installing-with-pipx)
 
 > [!Note]
-> 如果你没有其它 poetry 进行环境/依赖管理的项目，利用 pipx 或 pip 都可以完成 poetry 的安装，
+> 如果你没有其它 poetry 进行环境/依赖管理的项目，利用 pipx 或 pip 都可以完成 poetry 的安装，（Tips:如果你没有其它poetry的项目，推荐使用pipx进行安装，因为pipx可以为Poetry创建一个独立的环境，避免依赖冲突）
 
 > [!Note]
 > 如果您使用 Conda 或 Pyenv 作为您的环境/包管理器，在安装Poetry之后，
-> 使用如下命令使 Poetry 使用 virtualenv python environment (`poetry config virtualenvs.prefer-active-python true`)
+> 使用如下命令使 Poetry 使用 virtualenv python environment，而不是自身创建一个新的(`poetry config virtualenvs.prefer-active-python true`)
 
 
 ## 本地开发环境安装
@@ -36,7 +36,15 @@ cd  Langchain-Chatchat/libs/chatchat-server/
 ```shell
 poetry install --with lint,test
 ```
->  Poetry install后会在你的site-packages安装一个chatchat-`<version>`.dist-info文件夹带有direct_url.json文件，这个文件指向你的开发环境
+> Poetry install后会在你的site-packages安装一个chatchat-`<version>`.dist-info文件夹带有direct_url.json文件，这个文件指向你的开发环境
+> 可以通过`conda list langchain-chatchat` 检查该项目的site-packaga是否安装，若没有，则无法`import chatchat ...`
+
+#### 推理引擎接口安装
+
+以xinference为例, 引擎安装参考[安装 — Xinference](https://inference.readthedocs.io/zh-cn/latest/getting_started/installation.html).
+
+引擎接口需要`xinference-client`包, 可以通过`poetry install --extras xinference`安装.
+
 
 ## 格式化和代码检查
 在提交PR之前,请在本地运行以下命令;CI系统也会进行检查。
