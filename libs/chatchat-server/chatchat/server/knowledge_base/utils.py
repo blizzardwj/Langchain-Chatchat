@@ -510,9 +510,9 @@ def format_reference(kb_name: str, docs: List[Dict], api_base_url: str = "") -> 
     将知识库检索结果格式化为参考文档的格式
     '''
     from chatchat.server.utils import api_address
-    api_base_url = api_base_url or api_address()
-    from chatchat.server.knowledge_base.model.my_metadatas import KB_NEED_METADATA, confidential_context_processor
-
+    api_base_url = api_base_url or api_address(is_public=True)
+    # from chatchat.server.knowledge_base.model.my_metadatas import KB_NEED_METADATA, confidential_context_processor
+    from chatchat.server.knowledge_base.kb_metadatas import context_processor
     source_documents = []
     contexts = []
     for inum, doc in enumerate(docs):
@@ -523,15 +523,16 @@ def format_reference(kb_name: str, docs: List[Dict], api_base_url: str = "") -> 
                 "file_name": filename,
             }
         )
+        api_base_url = api_base_url.strip(" /")
         url = (
                 f"{api_base_url}/knowledge_base/download_doc?" + parameters
         )
         page_content = doc.get("page_content")
         if kb_name in KB_NEED_METADATA.keys():
             # if you need to add metadata to the reference, you can add it here
-            confidential_context_processor.set_sample_source(kb_name=kb_name, docs=[doc])
-            context = confidential_context_processor.get_sample_context(idx_ctx=inum + 1)
-            expander_context = confidential_context_processor.expander_context[0]
+            context_processor.set_sample_source(kb_name=kb_name, docs=[doc])
+            context = context_processor.get_sample_context(idx_ctx=inum + 1)
+            expander_context = context_processor.expander_context[0]
             ref = f"""出处 [{inum + 1}] [{filename}]({url}) \n\n{expander_context} chunk内容：\n\n{page_content}\n\n"""
         else:
             context = page_content

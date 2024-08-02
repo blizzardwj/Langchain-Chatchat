@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 from abc import ABCMeta, abstractmethod
 from typing import List, Tuple, Any
 
@@ -18,7 +21,7 @@ class BaseRetrieverService(metaclass=ABCMeta):
     def from_vectorstore(
         vectorstore: VectorStore,
         top_k: int,
-        score_threshold: int or float,
+        score_threshold: int | float,
     ):
         pass
 
