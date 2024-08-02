@@ -10,11 +10,14 @@
 config/
 .vscode/
 # UI
-/libs/chatchat-server/chatchat/img/*
+/libs/chatchat-server/chatchat/img/chat_icon_129360.png
+/libs/chatchat-server/chatchat/img/zf_info_logo.png
 /libs/chatchat-server/chatchat/webui.py
-/libs/chatchat-server/chatchat/webui_pages/*
 # metadata
 /libs/chatchat-server/chatchat/server/knowledge_base/model/my_metadatas.py
+# knowledge sample tool
+/libs/chatchat-server/chatchat/server/agent/tools_factory/search_knowledge_sample.py
+
 
 # below are standard python ignore files
 # Byte-compiled / optimized / DLL files
